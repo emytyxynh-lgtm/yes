@@ -1,67 +1,229 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Yes / No Demo</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 100px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YES OR NO</title>
 
-    button {
-      font-size: 20px;
-      padding: 10px 20px;
-      margin: 10px;
-      cursor: pointer;
-    }
-  </style>
+<style>
+*{
+  box-sizing:border-box;
+  font-family: "Segoe UI", monospace;
+}
+
+body{
+  margin:0;
+  height:100vh;
+  background:
+    linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
+    url("YOUR_IMAGE_URL_HERE") center/cover no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  color:#fff;
+}
+
+/* Card */
+.card{
+  width:320px;
+  padding:30px 20px;
+  text-align:center;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(14px);
+  border-radius:22px;
+  box-shadow:0 0 40px rgba(0,255,170,.25);
+  animation:fadeIn .8s ease;
+}
+
+h1{
+  font-size:22px;
+  letter-spacing:2px;
+}
+
+.sub{
+  font-size:12px;
+  opacity:.7;
+  margin-bottom:28px;
+}
+
+/* Buttons */
+button{
+  width:100%;
+  padding:16px;
+  margin:10px 0;
+  border:none;
+  border-radius:16px;
+  cursor:pointer;
+  transition:.25s ease;
+}
+
+#yes{
+  font-size:28px;
+  letter-spacing:4px;
+  color:#00ffaa;
+  background:rgba(0,255,170,.15);
+  box-shadow:0 0 20px rgba(0,255,170,.6);
+}
+
+#yes:hover{
+  box-shadow:0 0 40px rgba(0,255,170,1);
+}
+
+#no{
+  position:absolute;
+  font-size:18px;
+  color:#fff;
+  background:transparent;
+  opacity:.7;
+}
+
+/* YES screen */
+#yesScreen{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  font-size:36px;
+  animation:zoomIn .6s ease forwards;
+}
+
+/* Flash */
+.flash{
+  position:fixed;
+  inset:0;
+  background:white;
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Firework */
+.spark{
+  position:fixed;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#00ffaa;
+  animation:spark 1s linear forwards;
+}
+
+/* Animations */
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px)}
+  to{opacity:1}
+}
+
+@keyframes zoomIn{
+  from{transform:scale(.2); opacity:0}
+  to{transform:scale(1); opacity:1}
+}
+
+@keyframes spark{
+  to{
+    transform:translate(var(--x),var(--y));
+    opacity:0;
+  }
+}
+</style>
 </head>
+
 <body>
 
-  <!-- Màn hình câu hỏi -->
-  <div id="question-screen">
-    <h2>Bạn có đồng ý không?</h2>
+<div class="card" id="card">
+  <h1>BẠN CÓ ĐỒNG Ý KHÔNG ?</h1>
+  <div class="sub">yes or no</div>
+  <button id="yes">YES</button>
+</div>
 
-    <button id="yes-button" onclick="handleYesClick()">YES</button>
-    <button id="no-button" onclick="handleNoClick()">NO</button>
-  </div>
+<button id="no">NO</button>
 
-  <!-- Màn hình YES (ẩn ban đầu) -->
-  <div id="yes-screen" style="display:none;">
-    <h1>Bạn đã chọn YES 😍</h1>
-  </div>
+<div id="yesScreen">❤️ ACCEPTED ❤️</div>
+<div class="flash" id="flash"></div>
 
-  <script>
-    let messageIndex = 0;
+<!-- AUDIO -->
+<audio id="bgm" loop>
+  <source src="https://assets.mixkit.co/music/preview/mixkit-dark-ambient-ambient-110.mp3">
+</audio>
 
-    const messages = [
-      "Bạn chắc chưa?",
-      "Nghĩ lại đi 😏",
-      "Đừng mà 😭",
-      "YES đi mà ❤️"
-    ];
+<audio id="click">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-retro-click-223.mp3">
+</audio>
 
-    function handleNoClick() {
-      const noButton = document.querySelector('#no-button');
-      const yesButton = document.querySelector('#yes-button');
+<script>
+const no = document.getElementById("no");
+const yes = document.getElementById("yes");
+const card = document.getElementById("card");
+const yesScreen = document.getElementById("yesScreen");
+const bgm = document.getElementById("bgm");
+const click = document.getElementById("click");
+const flash = document.getElementById("flash");
 
-      noButton.textContent = messages[messageIndex];
-      messageIndex = (messageIndex + 1) % messages.length;
-
-      const currentSize = parseFloat(
-        window.getComputedStyle(yesButton).fontSize
-      );
-
-      yesButton.style.fontSize = (currentSize * 1.5) + "px";
+/* Fade music */
+function fadeAudio(audio, from, to, time){
+  let step = (to-from)/(time/50);
+  audio.volume = from;
+  let i = setInterval(()=>{
+    audio.volume += step;
+    if((step>0 && audio.volume>=to) || (step<0 && audio.volume<=to)){
+      audio.volume = to;
+      clearInterval(i);
     }
+  },50);
+}
 
-    function handleYesClick() {
-      document.getElementById('question-screen').style.display = "none";
-      document.getElementById('yes-screen').style.display = "block";
-    }
-  </script>
+/* Start music */
+document.body.addEventListener("click",()=>{
+  bgm.play();
+  fadeAudio(bgm,0,0.6,1500);
+},{once:true});
+
+/* NO teleport + fake click */
+no.onclick = ()=> {
+  navigator.vibrate?.(100);
+};
+
+document.addEventListener("mousemove",(e)=>{
+  const r = no.getBoundingClientRect();
+  const dx = e.clientX-(r.left+r.width/2);
+  const dy = e.clientY-(r.top+r.height/2);
+  if(Math.hypot(dx,dy)<120){
+    no.style.left = Math.random()*(innerWidth-80)+"px";
+    no.style.top  = Math.random()*(innerHeight-40)+"px";
+  }
+});
+
+/* YES click */
+yes.onclick = ()=>{
+  click.play();
+  fadeAudio(bgm,0.6,0,800);
+
+  card.style.display="none";
+  no.style.display="none";
+  yesScreen.style.display="flex";
+
+  flash.style.opacity=1;
+  setTimeout(()=>flash.style.opacity=0,120);
+
+  navigator.vibrate?.([100,50,100]);
+  fireworks();
+};
+
+/* Fireworks */
+function fireworks(){
+  for(let i=0;i<120;i++){
+    const s=document.createElement("div");
+    s.className="spark";
+    s.style.left="50%";
+    s.style.top="50%";
+    s.style.setProperty("--x",(Math.random()*400-200)+"px");
+    s.style.setProperty("--y",(Math.random()*400-200)+"px");
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),1000);
+  }
+}
+</script>
 
 </body>
 </html>
