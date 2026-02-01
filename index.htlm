@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Yes / No Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    button {
+      font-size: 20px;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Màn hình câu hỏi -->
+  <div id="question-screen">
+    <h2>Bạn có đồng ý không?</h2>
+
+    <button id="yes-button" onclick="handleYesClick()">YES</button>
+    <button id="no-button" onclick="handleNoClick()">NO</button>
+  </div>
+
+  <!-- Màn hình YES (ẩn ban đầu) -->
+  <div id="yes-screen" style="display:none;">
+    <h1>Bạn đã chọn YES 😍</h1>
+  </div>
+
+  <script>
+    let messageIndex = 0;
+
+    const messages = [
+      "Bạn chắc chưa?",
+      "Nghĩ lại đi 😏",
+      "Đừng mà 😭",
+      "YES đi mà ❤️"
+    ];
+
+    function handleNoClick() {
+      const noButton = document.querySelector('#no-button');
+      const yesButton = document.querySelector('#yes-button');
+
+      noButton.textContent = messages[messageIndex];
+      messageIndex = (messageIndex + 1) % messages.length;
+
+      const currentSize = parseFloat(
+        window.getComputedStyle(yesButton).fontSize
+      );
+
+      yesButton.style.fontSize = (currentSize * 1.5) + "px";
+    }
+
+    function handleYesClick() {
+      document.getElementById('question-screen').style.display = "none";
+      document.getElementById('yes-screen').style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
