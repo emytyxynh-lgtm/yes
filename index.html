@@ -3,72 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YES or NO – GOD MODE</title>
+<title>YES or NO – GOD MODE v28.2</title>
 
 <style>
 *{box-sizing:border-box;font-family:monospace}
 body{
-  margin:0;
-  height:100vh;
+  margin:0;height:100vh;
   background:url("YOUR_IMAGE_URL_HERE") center/cover no-repeat;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  overflow:hidden;
-  color:#fff;
+  display:flex;justify-content:center;align-items:center;
+  overflow:hidden;color:#fff;
 }
-
-/* Dark overlay */
 body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  z-index:-1;
+  content:"";position:fixed;inset:0;
+  background:rgba(0,0,0,.65);z-index:-2;
 }
 
-/* Card */
+/* ===== CARD ===== */
 .card{
-  width:340px;
-  padding:30px;
-  text-align:center;
+  width:340px;padding:30px;text-align:center;
   background:rgba(0,0,0,.45);
   backdrop-filter:blur(14px);
   border-radius:24px;
   box-shadow:0 0 40px rgba(255,0,100,.25);
   animation:fadeIn .8s ease;
+  display:none;
 }
+h1{letter-spacing:3px;text-shadow:0 0 12px rgba(255,0,100,.7)}
+.sub{font-size:13px;opacity:.8;margin-bottom:25px}
 
-h1{
-  letter-spacing:3px;
-  text-shadow:0 0 12px rgba(255,0,100,.7);
-}
-
-.sub{
-  font-size:13px;
-  opacity:.8;
-  margin-bottom:25px;
-}
-
-/* Buttons */
+/* ===== BUTTONS ===== */
 button{
-  width:100%;
-  padding:16px;
-  margin:12px 0;
-  border:none;
-  border-radius:18px;
-  cursor:pointer;
-  transition:.25s;
+  width:100%;padding:16px;margin:12px 0;
+  border:none;border-radius:18px;cursor:pointer;
 }
-
 #yes{
   font-size:30px;
   background:rgba(255,255,255,.15);
   color:white;
   box-shadow:0 0 20px rgba(255,0,120,.8);
 }
-#yes:hover{transform:scale(1.05)}
-
 #no{
   position:absolute;
   padding:12px 22px;
@@ -77,62 +50,62 @@ button{
   border:1px solid rgba(255,255,255,.3);
 }
 
-/* YES screen */
+/* ===== YES SCREEN ===== */
 #yesScreen{
-  position:fixed;
-  inset:0;
-  background:black;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  font-size:42px;
-  text-align:center;
+  position:fixed;inset:0;
+  background:black;display:none;
+  justify-content:center;align-items:center;
+  font-size:36px;text-align:center;
   animation:flash .8s ease;
 }
 
-/* Hearts */
-.heart{
-  position:fixed;
-  font-size:24px;
-  animation:float 2.5s linear forwards;
+/* ===== EFFECTS ===== */
+.heart{position:fixed;font-size:24px;animation:float 2.5s linear forwards}
+.spark{position:fixed;width:6px;height:6px;background:white;border-radius:50%;animation:boom 1s ease-out forwards}
+
+/* ===== MODAL ===== */
+#nameModal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.85);
+  display:flex;justify-content:center;align-items:center;
+  z-index:9999;
+}
+.modalBox{
+  background:black;padding:30px;
+  border-radius:18px;
+  width:300px;text-align:center;
+}
+.modalBox input{
+  width:100%;padding:12px;
+  margin:15px 0;border:none;border-radius:12px;
+}
+.modalBox button{width:100%;padding:12px}
+
+/* ===== TERMINAL ===== */
+#terminal{
+  position:fixed;bottom:10px;left:10px;
+  font-size:11px;opacity:.35;
+  line-height:1.4;
 }
 
-/* Firework */
-.spark{
-  position:fixed;
-  width:6px;
-  height:6px;
-  background:white;
-  border-radius:50%;
-  animation:boom 1s ease-out forwards;
-}
-
-/* Animations */
-@keyframes float{
-  from{opacity:1;transform:translateY(0) scale(1)}
-  to{opacity:0;transform:translateY(-220px) scale(1.8)}
-}
-@keyframes boom{
-  to{
-    transform:translate(
-      calc(var(--x)*1px),
-      calc(var(--y)*1px)
-    );
-    opacity:0;
-  }
-}
-@keyframes flash{
-  0%{background:white;color:black}
-  100%{background:black;color:white}
-}
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(20px)}
-  to{opacity:1}
-}
+/* ===== ANIM ===== */
+@keyframes float{to{opacity:0;transform:translateY(-220px) scale(1.8)}}
+@keyframes boom{to{transform:translate(calc(var(--x)*1px),calc(var(--y)*1px));opacity:0}}
+@keyframes flash{0%{background:white;color:black}100%{background:black;color:white}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1}}
 </style>
 </head>
 
 <body>
+
+<!-- NAME MODAL -->
+<div id="nameModal">
+  <div class="modalBox">
+    <h3>Nhập tên của bạn</h3>
+    <input id="nameInput" placeholder="Tên của bạn...">
+    <button id="saveName">Xác nhận</button>
+  </div>
+</div>
 
 <div class="card" id="card">
   <h1>ĐỒNG Ý KHÔNG?</h1>
@@ -141,87 +114,64 @@ button{
 </div>
 
 <button id="no">NO</button>
+<div id="yesScreen"></div>
+<div id="terminal"></div>
 
-<div id="yesScreen">❤️ YOU SAID YES ❤️</div>
-
-<!-- AUDIO -->
-<audio id="bgm" loop>
-  <source src="https://assets.mixkit.co/music/preview/mixkit-soft-ambient-110.mp3">
-</audio>
-<audio id="click">
-  <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3">
-</audio>
+<audio id="bgm" loop src="https://assets.mixkit.co/music/preview/mixkit-soft-ambient-110.mp3"></audio>
+<audio id="click" src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3"></audio>
 
 <script>
-const no = document.getElementById("no");
-const yes = document.getElementById("yes");
-const card = document.getElementById("card");
-const yesScreen = document.getElementById("yesScreen");
-const bgm = document.getElementById("bgm");
-const click = document.getElementById("click");
+const WEBHOOK_URL="YOUR_DISCORD_WEBHOOK";
+const $=id=>document.getElementById(id);
 
-/* Fade music */
-function fadeIn(audio){
-  audio.volume=0;
-  audio.play();
-  let v=setInterval(()=>{
-    if(audio.volume<1) audio.volume+=0.02;
-    else clearInterval(v);
-  },60);
-}
-function fadeOut(audio){
-  let v=setInterval(()=>{
-    if(audio.volume>0) audio.volume-=0.02;
-    else{audio.pause();clearInterval(v);}
-  },60);
-}
+const nameModal=$("nameModal"),nameInput=$("nameInput");
+const saveName=$("saveName"),card=$("card");
+const yes=$("yes"),no=$("no"),yesScreen=$("yesScreen");
+const terminal=$("terminal"),bgm=$("bgm"),click=$("click");
 
-/* Start music */
-document.body.addEventListener("click",()=>fadeIn(bgm),{once:true});
+let username=localStorage.getItem("username");
 
-/* NO teleport + fake click */
-no.addEventListener("mouseover",()=>{
-  fakeClick();
-  teleport();
-});
-
-function teleport(){
-  no.style.left=Math.random()*(innerWidth-100)+"px";
-  no.style.top=Math.random()*(innerHeight-50)+"px";
-}
-
-function fakeClick(){
-  no.textContent="CLICK?";
-  setTimeout(()=>no.textContent="NO",300);
-}
-
-/* YES click */
-yes.onclick=()=>{
-  click.play();
-  fadeOut(bgm);
-  card.style.display="none";
-  no.style.display="none";
-  yesScreen.style.display="flex";
-  heartRain();
-  fireworks();
-  sendDiscord();
-  if(navigator.vibrate) navigator.vibrate([200,100,200]);
+/* ===== NAME ===== */
+if(username){nameModal.remove();card.style.display="block";}
+saveName.onclick=()=>{
+  if(!nameInput.value.trim())return;
+  username=nameInput.value.trim();
+  localStorage.setItem("username",username);
+  nameModal.remove();card.style.display="block";
 };
 
-/* Hearts */
-function heartRain(){
+/* ===== MUSIC ===== */
+document.body.addEventListener("click",()=>{
+  bgm.volume=0;bgm.play();
+  const i=setInterval(()=>{bgm.volume+=0.02;bgm.volume>=1&&clearInterval(i)},60);
+},{once:true});
+
+/* ===== NO ===== */
+no.onmouseover=()=>{
+  no.style.left=Math.random()*(innerWidth-120)+"px";
+  no.style.top=Math.random()*(innerHeight-60)+"px";
+};
+
+/* ===== YES ===== */
+yes.onclick=()=>{
+  click.play();bgm.pause();
+  card.remove();no.remove();
+  yesScreen.innerHTML=`❤️ ${username} SAID YES ❤️`;
+  yesScreen.style.display="flex";
+  localStorage.setItem("lastYes",new Date().toLocaleString());
+  hearts();fireworks();sendDiscord();
+};
+
+/* ===== EFFECTS ===== */
+function hearts(){
   setInterval(()=>{
     const h=document.createElement("div");
-    h.className="heart";
-    h.innerHTML="❤️";
+    h.className="heart";h.innerHTML="❤️";
     h.style.left=Math.random()*innerWidth+"px";
-    h.style.bottom="0";
-    document.body.appendChild(h);
+    h.style.bottom="0";document.body.appendChild(h);
     setTimeout(()=>h.remove(),2500);
   },120);
 }
-
-/* Fireworks */
 function fireworks(){
   for(let i=0;i<80;i++){
     const s=document.createElement("div");
@@ -235,14 +185,20 @@ function fireworks(){
   }
 }
 
-/* Discord webhook */
+/* ===== TERMINAL LOG ===== */
+const logs=["[SYS] Initializing...","[AI] Analyzing choice...","[CORE] God Mode online"];
+let i=0;
+setInterval(()=>{
+  terminal.innerHTML+=logs[i%logs.length]+"<br>";
+  i++;terminal.scrollTop=9999;
+},1200);
+
+/* ===== DISCORD ===== */
 function sendDiscord(){
-  fetch("https://discord.com/api/webhooks/1466372734945595537/xclykYndX7PSAUIBGCiJzV0MNY08Hd-dmD4rIhebpc9Q350uxb6JwlVtDywMPBJUa4nt",{
+  fetch(WEBHOOK_URL,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      content:"🔥 **SOMEONE CLICKED YES** 🔥\n💖 Romantic mode activated"
-    })
+    body:JSON.stringify({content:`🔥 ${username} clicked YES`})
   });
 }
 </script>
