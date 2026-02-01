@@ -3,20 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YES OR NO</title>
+<title>YES or NO – GOD MODE</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  font-family: "Segoe UI", monospace;
-}
-
+*{box-sizing:border-box;font-family:monospace}
 body{
   margin:0;
   height:100vh;
-  background:
-    linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
-    url("YOUR_IMAGE_URL_HERE") center/cover no-repeat;
+  background:url("YOUR_IMAGE_URL_HERE") center/cover no-repeat;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -24,58 +18,63 @@ body{
   color:#fff;
 }
 
+/* Dark overlay */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  z-index:-1;
+}
+
 /* Card */
 .card{
-  width:320px;
-  padding:30px 20px;
+  width:340px;
+  padding:30px;
   text-align:center;
   background:rgba(0,0,0,.45);
   backdrop-filter:blur(14px);
-  border-radius:22px;
-  box-shadow:0 0 40px rgba(0,255,170,.25);
+  border-radius:24px;
+  box-shadow:0 0 40px rgba(255,0,100,.25);
   animation:fadeIn .8s ease;
 }
 
 h1{
-  font-size:22px;
-  letter-spacing:2px;
+  letter-spacing:3px;
+  text-shadow:0 0 12px rgba(255,0,100,.7);
 }
 
 .sub{
-  font-size:12px;
-  opacity:.7;
-  margin-bottom:28px;
+  font-size:13px;
+  opacity:.8;
+  margin-bottom:25px;
 }
 
 /* Buttons */
 button{
   width:100%;
   padding:16px;
-  margin:10px 0;
+  margin:12px 0;
   border:none;
-  border-radius:16px;
+  border-radius:18px;
   cursor:pointer;
-  transition:.25s ease;
+  transition:.25s;
 }
 
 #yes{
-  font-size:28px;
-  letter-spacing:4px;
-  color:#00ffaa;
-  background:rgba(0,255,170,.15);
-  box-shadow:0 0 20px rgba(0,255,170,.6);
+  font-size:30px;
+  background:rgba(255,255,255,.15);
+  color:white;
+  box-shadow:0 0 20px rgba(255,0,120,.8);
 }
-
-#yes:hover{
-  box-shadow:0 0 40px rgba(0,255,170,1);
-}
+#yes:hover{transform:scale(1.05)}
 
 #no{
   position:absolute;
-  font-size:18px;
-  color:#fff;
+  padding:12px 22px;
   background:transparent;
-  opacity:.7;
+  color:#aaa;
+  border:1px solid rgba(255,255,255,.3);
 }
 
 /* YES screen */
@@ -86,17 +85,16 @@ button{
   display:none;
   justify-content:center;
   align-items:center;
-  font-size:36px;
-  animation:zoomIn .6s ease forwards;
+  font-size:42px;
+  text-align:center;
+  animation:flash .8s ease;
 }
 
-/* Flash */
-.flash{
+/* Hearts */
+.heart{
   position:fixed;
-  inset:0;
-  background:white;
-  opacity:0;
-  pointer-events:none;
+  font-size:24px;
+  animation:float 2.5s linear forwards;
 }
 
 /* Firework */
@@ -104,27 +102,32 @@ button{
   position:fixed;
   width:6px;
   height:6px;
+  background:white;
   border-radius:50%;
-  background:#00ffaa;
-  animation:spark 1s linear forwards;
+  animation:boom 1s ease-out forwards;
 }
 
 /* Animations */
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(20px)}
-  to{opacity:1}
+@keyframes float{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:0;transform:translateY(-220px) scale(1.8)}
 }
-
-@keyframes zoomIn{
-  from{transform:scale(.2); opacity:0}
-  to{transform:scale(1); opacity:1}
-}
-
-@keyframes spark{
+@keyframes boom{
   to{
-    transform:translate(var(--x),var(--y));
+    transform:translate(
+      calc(var(--x)*1px),
+      calc(var(--y)*1px)
+    );
     opacity:0;
   }
+}
+@keyframes flash{
+  0%{background:white;color:black}
+  100%{background:black;color:white}
+}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1}
 }
 </style>
 </head>
@@ -132,23 +135,21 @@ button{
 <body>
 
 <div class="card" id="card">
-  <h1>BẠN CÓ ĐỒNG Ý KHÔNG ?</h1>
-  <div class="sub">yes or no</div>
+  <h1>ĐỒNG Ý KHÔNG?</h1>
+  <div class="sub">There is no escape 😈</div>
   <button id="yes">YES</button>
 </div>
 
 <button id="no">NO</button>
 
-<div id="yesScreen">❤️ ACCEPTED ❤️</div>
-<div class="flash" id="flash"></div>
+<div id="yesScreen">❤️ YOU SAID YES ❤️</div>
 
 <!-- AUDIO -->
 <audio id="bgm" loop>
-  <source src="https://assets.mixkit.co/music/preview/mixkit-dark-ambient-ambient-110.mp3">
+  <source src="https://assets.mixkit.co/music/preview/mixkit-soft-ambient-110.mp3">
 </audio>
-
 <audio id="click">
-  <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-retro-click-223.mp3">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3">
 </audio>
 
 <script>
@@ -158,70 +159,91 @@ const card = document.getElementById("card");
 const yesScreen = document.getElementById("yesScreen");
 const bgm = document.getElementById("bgm");
 const click = document.getElementById("click");
-const flash = document.getElementById("flash");
 
 /* Fade music */
-function fadeAudio(audio, from, to, time){
-  let step = (to-from)/(time/50);
-  audio.volume = from;
-  let i = setInterval(()=>{
-    audio.volume += step;
-    if((step>0 && audio.volume>=to) || (step<0 && audio.volume<=to)){
-      audio.volume = to;
-      clearInterval(i);
-    }
-  },50);
+function fadeIn(audio){
+  audio.volume=0;
+  audio.play();
+  let v=setInterval(()=>{
+    if(audio.volume<1) audio.volume+=0.02;
+    else clearInterval(v);
+  },60);
+}
+function fadeOut(audio){
+  let v=setInterval(()=>{
+    if(audio.volume>0) audio.volume-=0.02;
+    else{audio.pause();clearInterval(v);}
+  },60);
 }
 
 /* Start music */
-document.body.addEventListener("click",()=>{
-  bgm.play();
-  fadeAudio(bgm,0,0.6,1500);
-},{once:true});
+document.body.addEventListener("click",()=>fadeIn(bgm),{once:true});
 
 /* NO teleport + fake click */
-no.onclick = ()=> {
-  navigator.vibrate?.(100);
-};
-
-document.addEventListener("mousemove",(e)=>{
-  const r = no.getBoundingClientRect();
-  const dx = e.clientX-(r.left+r.width/2);
-  const dy = e.clientY-(r.top+r.height/2);
-  if(Math.hypot(dx,dy)<120){
-    no.style.left = Math.random()*(innerWidth-80)+"px";
-    no.style.top  = Math.random()*(innerHeight-40)+"px";
-  }
+no.addEventListener("mouseover",()=>{
+  fakeClick();
+  teleport();
 });
 
-/* YES click */
-yes.onclick = ()=>{
-  click.play();
-  fadeAudio(bgm,0.6,0,800);
+function teleport(){
+  no.style.left=Math.random()*(innerWidth-100)+"px";
+  no.style.top=Math.random()*(innerHeight-50)+"px";
+}
 
+function fakeClick(){
+  no.textContent="CLICK?";
+  setTimeout(()=>no.textContent="NO",300);
+}
+
+/* YES click */
+yes.onclick=()=>{
+  click.play();
+  fadeOut(bgm);
   card.style.display="none";
   no.style.display="none";
   yesScreen.style.display="flex";
-
-  flash.style.opacity=1;
-  setTimeout(()=>flash.style.opacity=0,120);
-
-  navigator.vibrate?.([100,50,100]);
+  heartRain();
   fireworks();
+  sendDiscord();
+  if(navigator.vibrate) navigator.vibrate([200,100,200]);
 };
+
+/* Hearts */
+function heartRain(){
+  setInterval(()=>{
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerHTML="❤️";
+    h.style.left=Math.random()*innerWidth+"px";
+    h.style.bottom="0";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),2500);
+  },120);
+}
 
 /* Fireworks */
 function fireworks(){
-  for(let i=0;i<120;i++){
+  for(let i=0;i<80;i++){
     const s=document.createElement("div");
     s.className="spark";
-    s.style.left="50%";
-    s.style.top="50%";
-    s.style.setProperty("--x",(Math.random()*400-200)+"px");
-    s.style.setProperty("--y",(Math.random()*400-200)+"px");
+    s.style.left=innerWidth/2+"px";
+    s.style.top=innerHeight/2+"px";
+    s.style.setProperty("--x",(Math.random()-0.5)*400);
+    s.style.setProperty("--y",(Math.random()-0.5)*400);
     document.body.appendChild(s);
     setTimeout(()=>s.remove(),1000);
   }
+}
+
+/* Discord webhook */
+function sendDiscord(){
+  fetch("https://discord.com/api/webhooks/1466372734945595537/xclykYndX7PSAUIBGCiJzV0MNY08Hd-dmD4rIhebpc9Q350uxb6JwlVtDywMPBJUa4nt",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      content:"🔥 **SOMEONE CLICKED YES** 🔥\n💖 Romantic mode activated"
+    })
+  });
 }
 </script>
 
